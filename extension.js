@@ -45,7 +45,13 @@ const ICEPortalIndicator = new Lang.Class({
 
           // If there is an actual GPS signal, the gpsStatus is "VALID"
           if (json['gpsStatus'] == "VALID") {
-            this._refreshUI(json['speed'].toString() + " km/h");
+
+            wagonClass = (json['wagonClass'] == "SECOND" ? "2nd" : "1st");
+
+            message = wagonClass + " class | " +
+                      json['speed'].toString() + " km/h";
+
+            this._refreshUI(message);
           }
         }
       )
