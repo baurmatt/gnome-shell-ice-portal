@@ -26,7 +26,7 @@ const ICEPortalIndicator = new Lang.Class({
   _refresh: function () {
     this._loadData(this._refreshUI);
     this._removeTimeout();
-    this._timeout = Mainloop.timeout_add_seconds(10, Lang.bind(this, this._refresh));
+    this._timeout = Mainloop.timeout_add_seconds(3, Lang.bind(this, this._refresh));
     return true;
   },
 
