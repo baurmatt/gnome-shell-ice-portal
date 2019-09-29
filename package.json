@@ -1,0 +1,16 @@
+{
+  "name": "db-ice-portal",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:mauricemeyer/gnome-shell-ice-portal.git",
+  "author": "Morre <morre@mor.re>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.5.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^2.1.1"
+  }
+}
