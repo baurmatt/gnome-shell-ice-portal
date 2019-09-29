@@ -64,9 +64,14 @@ const ICEPortalIndicator = new Lang.Class({
       }
 
       wagonClass = (resultStatus.wagonClass == 'SECOND' ? '2nd' : '1st');
+      nextStop = resultTrip.trip.stops.find(stop => stop.station.evaNr === resultTrip.trip.stopInfo.actualNext)
 
-      const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} ->  | ${resultStatus.speed} km/h`;
+      if (! nextStop) {
+        global.log("ICE Portal nextStop does not exist in trip.")
+        return
+      }
 
+      const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${nextStop.station.name} | ${resultStatus.speed} km/h`;
 
       this.refreshUI(text);
     });
