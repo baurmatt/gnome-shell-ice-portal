@@ -65,7 +65,7 @@ const ICEPortalIndicator = new Lang.Class({
 
       wagonClass = (resultStatus.wagonClass == 'SECOND' ? '2nd' : '1st');
 
-      const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} | ${wagonClass} class | ${resultStatus.speed} km/h`;
+      const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} | ${resultStatus.speed} km/h`;
 
 
       this._refreshUI(text);
