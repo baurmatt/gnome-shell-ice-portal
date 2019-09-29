@@ -8,7 +8,7 @@ const PanelMenu = imports.ui.panelMenu;
 
 const API_BASE = 'https://iceportal.de/api1/rs';
 
-let _httpSession;
+let session;
 const ICEPortalIndicator = new Lang.Class({
   Name: 'ICEPortal',
   Extends: PanelMenu.Button,
@@ -20,17 +20,17 @@ const ICEPortalIndicator = new Lang.Class({
       y_align: Clutter.ActorAlign.CENTER,
     });
     this.actor.add_actor(this.buttonText);
-    this._refresh();
+    this.refresh();
   },
 
-  _refresh() {
-    this._loadData(this._refreshUI);
-    this._removeTimeout();
-    this._timeout = Mainloop.timeout_add_seconds(3, Lang.bind(this, this._refresh));
+  refresh() {
+    this.loadData(this.refreshUI);
+    this.removeTimeout();
+    this.timeout = Mainloop.timeout_add_seconds(3, Lang.bind(this, this.refresh));
     return true;
   },
 
-  _loadData() {
+  loadData() {
     session = new Soup.Session({ 'user-agent': 'DB ICE Portal GNOME Shell extension' });
 
     const requestStatus = new Promise((resolve, reject) => {
@@ -65,37 +65,36 @@ const ICEPortalIndicator = new Lang.Class({
 
       wagonClass = (resultStatus.wagonClass == 'SECOND' ? '2nd' : '1st');
 
-      const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} | ${resultStatus.speed} km/h`;
+      const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} ->  | ${resultStatus.speed} km/h`;
 
 
-      this._refreshUI(text);
+      this.refreshUI(text);
     });
   },
 
-  _refreshUI(txt) {
+  refreshUI(txt) {
     this.buttonText.set_text(txt);
   },
 
-  _removeTimeout() {
-    if (this._timeout) {
-      Mainloop.source_remove(this._timeout);
-      this._timeout = null;
+  removeTimeout() {
+    if (this.timeout) {
+      Mainloop.source_remove(this.timeout);
+      this.timeout = null;
     }
   },
 
   stop() {
-    if (_httpSession !== undefined) _httpSession.abort();
-    _httpSession = undefined;
+    if (session !== undefined) session.abort();
+    session = undefined;
 
-    if (this._timeout) Mainloop.source_remove(this._timeout);
-    this._timeout = undefined;
+    if (this.timeout) Mainloop.source_remove(this.timeout);
+    this.timeout = undefined;
 
     this.menu.removeAll();
   },
 });
 
 let iceMenu;
-
 function init() {
 }
 
