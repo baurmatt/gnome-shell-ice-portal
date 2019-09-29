@@ -26,55 +26,83 @@ const ICEPortalIndicator = new Lang.Class({
   refresh() {
     this.loadData(this.refreshUI);
     this.removeTimeout();
-    this.timeout = Mainloop.timeout_add_seconds(3, Lang.bind(this, this.refresh));
+    this.timeout = Mainloop.timeout_add_seconds(
+      3,
+      Lang.bind(this, this.refresh),
+    );
+
     return true;
   },
 
   loadData() {
-    session = new Soup.Session({ 'user-agent': 'DB ICE Portal GNOME Shell extension' });
+    session = new Soup.Session({
+      'user-agent': 'DB ICE Portal GNOME Shell extension',
+    });
 
     const requestStatus = new Promise((resolve, reject) => {
-      const request = Soup.form_request_new_from_hash('GET', `${API_BASE}/status`, {});
+      const request = Soup.form_request_new_from_hash(
+        'GET',
+        `${API_BASE}/status`,
+        {},
+      );
 
-      session.queue_message(request, Lang.bind(this, (_, message) => {
-        if (message.status_code != 200) {
-          global.log(`ICE Portal ${message.status_code} ${message.response_body.data}`);
-          reject(message);
-        }
-        resolve(JSON.parse(message.response_body.data));
-      }));
+      session.queue_message(
+        request,
+        Lang.bind(this, (_, message) => {
+          if (message.status_code !== 200) {
+            global.log(
+              `ICE Portal ${message.status_code} ${message.response_body.data}`,
+            );
+            reject(message);
+          }
+          resolve(JSON.parse(message.response_body.data));
+        }),
+      );
     });
 
     const requestTrip = new Promise((resolve, reject) => {
-      const request = Soup.form_request_new_from_hash('GET', `${API_BASE}/tripInfo/trip`, {});
+      const request = Soup.form_request_new_from_hash(
+        'GET',
+        `${API_BASE}/tripInfo/trip`,
+        {},
+      );
 
-      session.queue_message(request, Lang.bind(this, (_, message) => {
-        if (message.status_code != 200) {
-          global.log(`ICE Portal ${message.status_code} ${message.response_body.data}`);
-          reject(message);
+      session.queue_message(
+        request,
+        Lang.bind(this, (_, message) => {
+          if (message.status_code !== 200) {
+            global.log(
+              `ICE Portal ${message.status_code} ${message.response_body.data}`,
+            );
+            reject(message);
+          }
+          resolve(JSON.parse(message.response_body.data));
+        }),
+      );
+    });
+
+    Promise.all([requestStatus, requestTrip]).then(
+      ([resultStatus, resultTrip]) => {
+        // If there is an actual GPS signal, the gpsStatus is "VALID"
+        if (resultStatus.gpsStatus !== 'VALID') {
+          return;
         }
-        resolve(JSON.parse(message.response_body.data));
-      }));
-    });
 
-    Promise.all([requestStatus, requestTrip]).then(([resultStatus, resultTrip]) => {
-      // If there is an actual GPS signal, the gpsStatus is "VALID"
-      if (resultStatus.gpsStatus != 'VALID') {
-        return;
-      }
+        const nextStop = resultTrip.trip.stops.find(
+          stop => stop.station.evaNr === resultTrip.trip.stopInfo.actualNext,
+        );
 
-      wagonClass = (resultStatus.wagonClass == 'SECOND' ? '2nd' : '1st');
-      nextStop = resultTrip.trip.stops.find(stop => stop.station.evaNr === resultTrip.trip.stopInfo.actualNext)
+        if (!nextStop) {
+          global.log('ICE Portal nextStop does not exist in trip.');
 
-      if (! nextStop) {
-        global.log("ICE Portal nextStop does not exist in trip.")
-        return
-      }
+          return;
+        }
 
-      const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${nextStop.station.name} | ${resultStatus.speed} km/h`;
+        const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${nextStop.station.name} | ${resultStatus.speed} km/h`;
 
-      this.refreshUI(text);
-    });
+        this.refreshUI(text);
+      },
+    );
   },
 
   refreshUI(txt) {
@@ -100,14 +128,17 @@ const ICEPortalIndicator = new Lang.Class({
 });
 
 let iceMenu;
-function init() {
-}
 
+// eslint-disable-next-line no-unused-vars
+function init() {}
+
+// eslint-disable-next-line no-unused-vars
 function enable() {
   iceMenu = new ICEPortalIndicator();
   Main.panel.addToStatusArea('iceportal-indicator', iceMenu);
 }
 
+// eslint-disable-next-line no-unused-vars
 function disable() {
   iceMenu.stop();
   iceMenu.destroy();
