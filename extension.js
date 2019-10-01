@@ -106,10 +106,23 @@ const ICEPortalIndicator = new Lang.Class({
         const delay = nextStop.timetable.arrivalDelay;
         const delayString = delay === '' ? '' : ` (${delay})`;
 
-        const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${resultTrip.trip.stopInfo.finalStationName} | ${resultStatus.speed} km/h | ${nextStop.station.name} 🕒 ${nextArrivalHour}:${nextArrivalMinute}${delayString} 🛤 ${nextStop.track.actual}`;
+        const wifiString = this.wifiSymbol(resultStatus.internet);
+
+        const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${resultTrip.trip.stopInfo.finalStationName} | WLAN: ${wifiString} | ${resultStatus.speed} km/h | ${nextStop.station.name} 🕒 ${nextArrivalHour}:${nextArrivalMinute}${delayString} 🛤 ${nextStop.track.actual}`;
 
         this.refreshUI(text);
       },
+    );
+  },
+
+  // switch-case variable assignment? Nah.
+  wifiSymbol(internetStatus) {
+    return (
+      {
+        HIGH: 'Good', // Verified on board
+        MIDDLE: 'Meh', // Verified on board
+        LOW: 'De facto offline', // TODO: Verify existance on board
+      }[internetStatus] || '?'
     );
   },
 
