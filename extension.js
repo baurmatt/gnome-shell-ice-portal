@@ -84,6 +84,7 @@ const ICEPortalIndicator = new Lang.Class({
     Promise.all([requestStatus, requestTrip]).then(
       ([resultStatus, resultTrip]) => {
         // If there is an actual GPS signal, the gpsStatus is "VALID"
+        // If we don’t do this, we might set the displayed speed to 0 in tunnels
         if (resultStatus.gpsStatus !== 'VALID') {
           return;
         }
@@ -98,7 +99,14 @@ const ICEPortalIndicator = new Lang.Class({
           return;
         }
 
-        const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${nextStop.station.name} | ${resultStatus.speed} km/h`;
+        const nextArrival = new Date(nextStop.timetable.actualArrivalTime);
+        const nextArrivalHour = nextArrival.getHours();
+        const nextArrivalMinute = nextArrival.getMinutes();
+
+        const delay = nextStop.timetable.arrivalDelay;
+        const delayString = delay === '' ? '' : ` (${delay})`;
+
+        const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${resultTrip.trip.stopInfo.finalStationName} | ${resultStatus.speed} km/h | ${nextStop.station.name} 🕒 ${nextArrivalHour}:${nextArrivalMinute}${delayString} 🛤 ${nextStop.track.actual}`;
 
         this.refreshUI(text);
       },
