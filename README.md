@@ -16,8 +16,6 @@ After that, open the GNOME Tweaks tool and under extensions, enable the extensio
 
 Display of the following will be integrated during one of my next train rides:
 
-* train type
-* train number
 * train destination
 * next stop with arrival time and delay
 * arrival track
