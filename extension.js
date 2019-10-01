@@ -16,7 +16,7 @@ const ICEPortalIndicator = new Lang.Class({
   _init() {
     this.parent(0.0, 'ICE Portal indicator', false);
     this.buttonText = new St.Label({
-      text: _('[ICE Portal connecting…]'),
+      text: _(''),
       y_align: Clutter.ActorAlign.CENTER,
     });
     this.actor.add_actor(this.buttonText);
