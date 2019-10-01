@@ -2,6 +2,8 @@
 
 This extension brings you the data from the ICE portal directly to your status bar.
 
+![A screenshot of the extension](db-ice-portal.png)
+
 ## Setup
 
 ```sh
