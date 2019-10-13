@@ -89,28 +89,31 @@ const ICEPortalIndicator = new Lang.Class({
           return;
         }
 
+        const wifiString = this.wifiSymbol(resultStatus.internet);
+
         const nextStop = resultTrip.trip.stops.find(
           stop => stop.station.evaNr === resultTrip.trip.stopInfo.actualNext,
         );
 
-        if (!nextStop) {
-          global.log('ICE Portal nextStop does not exist in trip.');
+        if (nextStop) {
+          const nextArrival = new Date(nextStop.timetable.actualArrivalTime);
+          const nextArrivalHour = nextArrival.getHours();
+          const nextArrivalMinute = nextArrival.getMinutes();
 
-          return;
+          const delay = nextStop.timetable.arrivalDelay;
+          const delayString = delay === '' ? '' : ` (${delay})`;
+
+
+          const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${resultTrip.trip.stopInfo.finalStationName} | WLAN: ${wifiString} | ${resultStatus.speed} km/h | ${nextStop.station.name} 🕒 ${nextArrivalHour}:${nextArrivalMinute}${delayString} 🛤 ${nextStop.track.actual}`;
+          this.refreshUI(text);
+
+        } else {
+          const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${resultTrip.trip.stopInfo.finalStationName} | WLAN: ${wifiString} | ${resultStatus.speed} km/h`;
+
+          global.log('ICE Portal nextStop does not exist in trip.');
+          this.refreshUI(text);
         }
 
-        const nextArrival = new Date(nextStop.timetable.actualArrivalTime);
-        const nextArrivalHour = nextArrival.getHours();
-        const nextArrivalMinute = nextArrival.getMinutes();
-
-        const delay = nextStop.timetable.arrivalDelay;
-        const delayString = delay === '' ? '' : ` (${delay})`;
-
-        const wifiString = this.wifiSymbol(resultStatus.internet);
-
-        const text = `${resultTrip.trip.trainType} ${resultTrip.trip.vzn} → ${resultTrip.trip.stopInfo.finalStationName} | WLAN: ${wifiString} | ${resultStatus.speed} km/h | ${nextStop.station.name} 🕒 ${nextArrivalHour}:${nextArrivalMinute}${delayString} 🛤 ${nextStop.track.actual}`;
-
-        this.refreshUI(text);
       },
     );
   },
